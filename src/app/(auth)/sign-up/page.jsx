@@ -1,24 +1,42 @@
 "use client";
 
+import { signUp } from "@/lid/auth-client";
 import { Check } from "@gravity-ui/icons";
 import { Button, Description, FieldError, Form, Input, Label, TextField } from "@heroui/react";
 
 export default function Basic() {
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const data = {};
+        const data = Object.fromEntries(formData.entries());
 
-        // Convert FormData to plain object
-        formData.forEach((value, key) => {
-            data[key] = value.toString();
-        });
-
-        alert(`Form submitted with: ${JSON.stringify(data, null, 2)}`);
+        const { data: resData, error } = await signUp.email({
+            name: data.name,
+            email: data.email,
+            password: data.password
+        })
+        console.log(resData, error);
     };
 
     return (
-        <Form className="flex w-96 flex-col gap-4" onSubmit={onSubmit}>
+        <Form className="flex w-96 flex-col gap-4 m-18" onSubmit={onSubmit}>
+
+            <TextField
+                isRequired
+                name="name"
+                validate={(value) => {
+                    if (value.length < 3) {
+                        return "Name must be at least 3 characters";
+                    }
+                    return null;
+                }}
+            >
+                <Label>Name</Label>
+                <Input placeholder="Your name" />
+                <FieldError />
+            </TextField>
+
+
             <TextField
                 isRequired
                 name="email"
